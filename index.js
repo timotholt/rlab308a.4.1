@@ -136,18 +136,15 @@ async function initialLoadAxios() {
 
 async function populateCarouselFetch() {
 
-debugger;
-
     // Clear the carousel
     clearCarousel();
-    startCarousel();
     // document.querySelector(".carousel-inner").innerHTML = "";
 
     // Clear the information section
     // infoDump.innerHTML = "";
 
     // Retrieve information on the selected breed from the cat API using fetch()
-    const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&api_key=${API_KEY}`);
+    const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&limit=10&api_key=${API_KEY}`);
 
     debugger;
 
@@ -174,6 +171,8 @@ debugger;
             return;
         }
 
+        console.log(`adding picture (${breed.id}) from (${breed.url})`)
+
         // Create a div for the picture
         let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
         appendCarousel(item);
@@ -197,6 +196,9 @@ debugger;
         // carouselItem.appendChild(description);
 
         // document.querySelector(".carousel-inner").appendChild(carouselItem);
+
+        startCarousel();
+
     });
 }
 
