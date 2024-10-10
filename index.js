@@ -11,7 +11,8 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+// const API_KEY = "";
+const API_KEY = 'live_gipO1O04xaeRbG8Sw5ID3Ylge8pdLBsvOIULoZ5jGIEdoRlA2NfkdkEudoYCsgKX';
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -21,6 +22,92 @@ const API_KEY = "";
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+
+async function initialLoadFetch() {
+    try {
+
+        // Fetch breed data
+        const response = await fetch(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
+
+        // If we got an immediate error fetching the breed data . . .
+        if (!response || !response.ok) {
+
+            // ... throw an error!
+            throw new Error(`HTTP error! status: ${response?.status}`);
+        }
+
+        // Otherwise wait for the data to load
+        const data = await response.json();
+
+        // If we got an error loading the data . . .
+        if (!Array.isArray(data)) {
+
+            // ... throw an error!
+            throw new Error('Invalid API response');
+        }
+
+        // loop through the data and create new <option> elements
+        data.forEach(breed => {
+
+            // if we don't have an id or name . . .
+            if (!breed?.id || !breed?.name) {
+                console.warn('Invalid breed data:', breed);
+                return;
+            }
+
+            // create a new <option> element
+            const option = document.createElement("option");
+            option.value = breed.id;
+            option.textContent = breed.name;
+            breedSelect.appendChild(option);
+        });
+    }
+    catch (error) {
+        console.error('Error loading breeds:', error);
+    }
+}
+
+//initialLoadFetch();
+
+async function initialLoadAxios() {
+    try {
+
+        // Fetch breed data
+        const response = await axios.get(`https://api.thecatapi.com/v1/breeds`, {
+            params: {
+                api_key: API_KEY
+            }
+        });
+
+        // If we got an error loading the data . . .
+        if (!Array.isArray(response.data)) {
+
+            // ... throw an error!
+            throw new Error('Invalid API response');
+        }
+
+        // loop through the data and create new <option> elements
+        response.data.forEach(breed => {
+
+            // if we don't have an id or name . . .
+            if (!breed?.id || !breed?.name) {
+                console.warn('Invalid breed data:', breed);
+                return;
+            }
+
+            // create a new <option> element
+            const option = document.createElement("option");
+            option.value = breed.id;
+            option.textContent = breed.name;
+            breedSelect.appendChild(option);
+        });
+    }
+    catch (error) {
+        console.error('Error loading breeds:', error);
+    }
+}
+
+initialLoadAxios();
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -36,6 +123,8 @@ const API_KEY = "";
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
+
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
