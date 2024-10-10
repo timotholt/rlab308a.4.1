@@ -61,9 +61,6 @@ async function initialLoadFetch() {
             breedSelect.appendChild(option);
         });
         
-
-        debugger;
-
         // Populate the carousel
         populateCarouselFetch();
 
@@ -110,6 +107,10 @@ async function initialLoadAxios() {
             option.textContent = breed.name;
             breedSelect.appendChild(option);
         });
+
+        // Populate the carousel
+        populateCarouselFetch();
+
     }
 
     catch (error) {
@@ -138,15 +139,9 @@ async function populateCarouselFetch() {
 
     // Clear the carousel
     clearCarousel();
-    // document.querySelector(".carousel-inner").innerHTML = "";
-
-    // Clear the information section
-    // infoDump.innerHTML = "";
 
     // Retrieve information on the selected breed from the cat API using fetch()
     const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&limit=10&api_key=${API_KEY}`);
-
-    debugger;
 
     // If we got an immediate error fetching the breed data . . .
     if (!breedApiResponse || !breedApiResponse.ok) {
@@ -176,35 +171,13 @@ async function populateCarouselFetch() {
         // Create a div for the picture
         let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
         appendCarousel(item);
-
-        // // create a new <div> element
-        // const carouselItem = document.createElement("div");
-        // carouselItem.classList.add("carousel-item");
-
-        // // create an <img> element for the image
-        // const img = document.createElement("img");
-        // img.src = breed.url;
-        // img.alt = breed.id;
-
-        // // create a <div> element for the description
-        // const description = document.createElement("div");
-        // description.classList.add("carousel-caption", "d-none", "d-md-block");
-        // description.textContent = breed.breeds[0].description;
-
-        // append the elements to the carousel
-        // carouselItem.appendChild(img);
-        // carouselItem.appendChild(description);
-
-        // document.querySelector(".carousel-inner").appendChild(carouselItem);
-
-        startCarousel();
-
     });
+
+    startCarousel();
+
 }
 
 // Add event handler
-
-debugger;
 
 breedSelect.addEventListener("change", async () => {
     populateCarouselFetch();
