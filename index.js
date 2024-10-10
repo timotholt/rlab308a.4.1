@@ -1,6 +1,3 @@
-// import * as Carousel from "./carousel.js";
-// import axios from "axios";
-
 // The breed selection input element.
 const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
@@ -24,30 +21,32 @@ const API_KEY = 'live_gipO1O04xaeRbG8Sw5ID3Ylge8pdLBsvOIULoZ5jGIEdoRlA2NfkdkEudo
  */
 
 async function initialLoadFetch() {
+
+    // Catch any errors by putting it in a try/catch block
     try {
 
         // Fetch breed data
-        const response = await fetch(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
+        const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
 
         // If we got an immediate error fetching the breed data . . .
-        if (!response || !response.ok) {
+        if (!breedApiResponse || !breedApiResponse.ok) {
 
             // ... throw an error!
-            throw new Error(`HTTP error! status: ${response?.status}`);
+            throw new Error(`HTTP error! status: ${breedApiResponse?.status}`);
         }
 
         // Otherwise wait for the data to load
-        const data = await response.json();
+        const breedData = await breedApiResponse.json();
 
         // If we got an error loading the data . . .
-        if (!Array.isArray(data)) {
+        if (!Array.isArray(breedData)) {
 
             // ... throw an error!
             throw new Error('Invalid API response');
         }
 
         // loop through the data and create new <option> elements
-        data.forEach(breed => {
+        breedData.forEach(breed => {
 
             // if we don't have an id or name . . .
             if (!breed?.id || !breed?.name) {
@@ -61,33 +60,43 @@ async function initialLoadFetch() {
             option.textContent = breed.name;
             breedSelect.appendChild(option);
         });
+        
+
+        debugger;
+
+        // Populate the carousel
+        populateCarouselFetch();
+
     }
     catch (error) {
         console.error('Error loading breeds:', error);
     }
 }
 
-//initialLoadFetch();
+debugger;
+initialLoadFetch();
 
 async function initialLoadAxios() {
+
+    // Catch any errors by putting it in a try/catch block
     try {
 
         // Fetch breed data
-        const response = await axios.get(`https://api.thecatapi.com/v1/breeds`, {
+        const breedResponse = await axios.get(`https://api.thecatapi.com/v1/breeds`, {
             params: {
                 api_key: API_KEY
             }
         });
 
         // If we got an error loading the data . . .
-        if (!Array.isArray(response.data)) {
+        if (!Array.isArray(breedResponse.data)) {
 
             // ... throw an error!
             throw new Error('Invalid API response');
         }
 
         // loop through the data and create new <option> elements
-        response.data.forEach(breed => {
+        breedResponse.data.forEach(breed => {
 
             // if we don't have an id or name . . .
             if (!breed?.id || !breed?.name) {
@@ -102,12 +111,13 @@ async function initialLoadAxios() {
             breedSelect.appendChild(option);
         });
     }
+
     catch (error) {
         console.error('Error loading breeds:', error);
     }
 }
 
-initialLoadAxios();
+// initialLoadAxios();
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -124,7 +134,79 @@ initialLoadAxios();
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
+async function populateCarouselFetch() {
 
+debugger;
+
+    // Clear the carousel
+    clearCarousel();
+    startCarousel();
+    // document.querySelector(".carousel-inner").innerHTML = "";
+
+    // Clear the information section
+    // infoDump.innerHTML = "";
+
+    // Retrieve information on the selected breed from the cat API using fetch()
+    const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&api_key=${API_KEY}`);
+
+    debugger;
+
+    // If we got an immediate error fetching the breed data . . .
+    if (!breedApiResponse || !breedApiResponse.ok) {
+        const error = new Error(`HTTP error! status: ${breedApiResponse?.status}`);
+        console.error('Error loading breed info:', error);
+        return;
+    }
+
+    // Otherwise wait for the data to load
+    const breedData = await breedApiResponse.json();
+
+    // If we got an error loading the data . . .
+    if (!Array.isArray(breedData)) {
+        console.error('Invalid API response');
+        return;
+    }
+
+    // loop through the data and create new <div> elements
+    breedData.forEach(breed => {
+        if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
+            console.warn('Invalid breed data:', breed);
+            return;
+        }
+
+        // Create a div for the picture
+        let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+        appendCarousel(item);
+
+        // // create a new <div> element
+        // const carouselItem = document.createElement("div");
+        // carouselItem.classList.add("carousel-item");
+
+        // // create an <img> element for the image
+        // const img = document.createElement("img");
+        // img.src = breed.url;
+        // img.alt = breed.id;
+
+        // // create a <div> element for the description
+        // const description = document.createElement("div");
+        // description.classList.add("carousel-caption", "d-none", "d-md-block");
+        // description.textContent = breed.breeds[0].description;
+
+        // append the elements to the carousel
+        // carouselItem.appendChild(img);
+        // carouselItem.appendChild(description);
+
+        // document.querySelector(".carousel-inner").appendChild(carouselItem);
+    });
+}
+
+// Add event handler
+
+debugger;
+
+breedSelect.addEventListener("change", async () => {
+    populateCarouselFetch();
+});
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
@@ -138,6 +220,7 @@ initialLoadAxios();
  *   by setting a default header with your API key so that you do not have to
  *   send it manually with all of your requests! You can also set a default base URL!
  */
+
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
@@ -166,6 +249,7 @@ initialLoadAxios();
  * - In your request interceptor, set the body element's cursor style to "progress."
  * - In your response interceptor, remove the progress cursor style from the body element.
  */
+
 /**
  * 8. To practice posting data, we'll create a system to "favourite" certain images.
  * - The skeleton of this function has already been created for you.
@@ -177,7 +261,7 @@ initialLoadAxios();
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-export async function favourite(imgId) {
+ async function favourite(imgId) {
   // your code here
 }
 

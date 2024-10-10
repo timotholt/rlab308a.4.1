@@ -69,14 +69,24 @@ body {
 }
 
 .card .img-wrapper {
-    max-width: 100%;
+    /* max-width: 100%; */
     display: flex;
     justify-content: center;
     align-items: center;
+
+    /*Tim*/
+    /* width: 50%;
+    max-width: 400px;
+    overflow: hidden; */
 }
 
-.card img {
+.card .img-wrapper img {
     max-height: 100%;
+    
+    /* Tim */
+    /* width: 100%;
+    object-fit: contain; */
+
 }
 
 @media (max-width: 767px) {

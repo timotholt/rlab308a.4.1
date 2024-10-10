@@ -1,7 +1,7 @@
 // import * as bootstrap from "bootstrap";
 // import { favourite } from "./index.js";
 
-export function createCarouselItem(imgSrc, imgAlt, imgId) {
+function createCarouselItem(imgSrc, imgAlt, imgId) {
   const template = document.querySelector("#carouselItemTemplate");
   const clone = template.content.firstElementChild.cloneNode(true);
 
@@ -17,14 +17,14 @@ export function createCarouselItem(imgSrc, imgAlt, imgId) {
   return clone;
 }
 
-export function clear() {
+function clearCarousel() {
   const carousel = document.querySelector("#carouselInner");
   while (carousel.firstChild) {
     carousel.removeChild(carousel.firstChild);
   }
 }
 
-export function appendCarousel(element) {
+function appendCarousel(element) {
   const carousel = document.querySelector("#carouselInner");
 
   const activeItem = document.querySelector(".carousel-item.active");
@@ -33,7 +33,7 @@ export function appendCarousel(element) {
   carousel.appendChild(element);
 }
 
-export function start() {
+function startCarousel() {
   const multipleCardCarousel = document.querySelector(
     "#carouselExampleControls"
   );
