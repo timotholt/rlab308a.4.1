@@ -188,7 +188,15 @@ async function populateCarouselFetch() {
             appendCarousel(item);
         });
 
+        debugger;
+
+        // Populate the information section
+        infoDump.innerHTML = "Hello world"
+        // infoDump.innerHTML = breedData[0].breeds[0].description;
+
+        // Restart the carousel
         startCarousel();
+
     } catch (error) {
         console.error('Error loading breed info:', error);
     }
@@ -258,6 +266,8 @@ async function populateCarouselAxios() {
 
             // Create a div for the picture
             let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+
+            // Append the div to the carousel
             appendCarousel(item);
         });
 
@@ -265,6 +275,10 @@ async function populateCarouselAxios() {
             progressBarElement.style.width = `100%`;
         }
 
+        // Put the breed description into the infoDump element
+        infoDump.innerHTML = breedResponse.data[0].breeds[0].description;
+
+        // Restart the carousel
         startCarousel();
 
     } catch (error) {
@@ -331,6 +345,10 @@ axiosInstance.interceptors.response.use((response) => {
  *   once or twice per request to this API. This is still a concept worth familiarizing yourself
  *   with for future projects.
  */
+
+//////////////////////////
+// DONE
+//////////////////////////
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
