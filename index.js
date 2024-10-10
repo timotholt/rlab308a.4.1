@@ -64,14 +64,41 @@ async function initialLoadFetch() {
         // Populate the carousel
         populateCarouselFetch();
 
+        // Add an event listener to the select element
+        breedSelect.addEventListener("change", async () => {
+            populateCarouselFetch();
+        });
     }
     catch (error) {
         console.error('Error loading breeds:', error);
     }
 }
 
-debugger;
-initialLoadFetch();
+//==============================================================================
+// Axios version
+
+const axiosInstance = axios.create({
+    baseURL: 'https://api.thecatapi.com/v1/',
+    params: {
+        api_key: API_KEY
+    }
+});
+
+// create an axios interceptor that makes a timestamp of when the request was started
+axiosInstance.interceptors.request.use((config) => {
+
+    // Console log the current date/time
+    console.log(`Request started at: ${new Date()}`);
+
+    config.params.timestamp = Date.now();
+    return config;
+});
+
+// create an axios inerceptor that logs the response time
+axiosInstance.interceptors.response.use((response) => {
+    console.log(`Response time: ${Date.now() - response.config.params.timestamp} ms`);
+    return response;
+});
 
 async function initialLoadAxios() {
 
@@ -79,7 +106,7 @@ async function initialLoadAxios() {
     try {
 
         // Fetch breed data
-        const breedResponse = await axios.get(`https://api.thecatapi.com/v1/breeds`, {
+        const breedResponse = await axiosInstance.get(`breeds`, {
             params: {
                 api_key: API_KEY
             }
@@ -109,16 +136,18 @@ async function initialLoadAxios() {
         });
 
         // Populate the carousel
-        populateCarouselFetch();
+        populateCarouselAxios();
 
+        // Add an event listener to the select element
+        breedSelect.addEventListener("change", async () => {
+            populateCarouselAxios();
+        });
     }
 
     catch (error) {
         console.error('Error loading breeds:', error);
     }
 }
-
-// initialLoadAxios();
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -174,18 +203,57 @@ async function populateCarouselFetch() {
     });
 
     startCarousel();
-
 }
 
-// Add event handler
+async function populateCarouselAxios() {
 
-breedSelect.addEventListener("change", async () => {
-    populateCarouselFetch();
-});
+    // Clear the carousel
+    clearCarousel();
+
+    // Retrieve information on the selected breed from the cat API using Axios
+    const breedResponse = await axiosInstance.get(`images/search`, {
+        params: {
+            breed_id: breedSelect.value,
+            limit: 10,
+        }
+    });
+
+    // If we got an error loading the data . . .
+    if (!Array.isArray(breedResponse.data)) {
+        console.error('Invalid API response');
+        return;
+    }
+
+    // loop through the data and create new <div> elements
+    breedResponse.data.forEach(breed => {
+        if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
+            console.warn('Invalid breed data:', breed);
+            return;
+        }
+
+        console.log(`adding picture (${breed.id}) from (${breed.url})`)
+
+        // Create a div for the picture
+        let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+        appendCarousel(item);
+    });
+
+    startCarousel();
+}
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
+
+// Fetch version
+// initialLoadFetch();
+
+
+// Axios version
+initialLoadAxios();
+
+
+
 /**
  * 4. Change all of your fetch() functions to axios!
  * - axios has already been imported for you within index.js.
