@@ -84,21 +84,6 @@ const axiosInstance = axios.create({
     }
 });
 
-// create an axios interceptor that makes a timestamp of when the request was started
-axiosInstance.interceptors.request.use((config) => {
-
-    // Console log the current date/time
-    console.log(`Request started at: ${new Date()}`);
-
-    config.params.timestamp = Date.now();
-    return config;
-});
-
-// create an axios inerceptor that logs the response time
-axiosInstance.interceptors.response.use((response) => {
-    console.log(`Response time: ${Date.now() - response.config.params.timestamp} ms`);
-    return response;
-});
 
 async function initialLoadAxios() {
 
@@ -169,90 +154,129 @@ async function populateCarouselFetch() {
     // Clear the carousel
     clearCarousel();
 
-    // Retrieve information on the selected breed from the cat API using fetch()
-    const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&limit=10&api_key=${API_KEY}`);
+    try {
+        // Retrieve information on the selected breed from the cat API using fetch()
+        const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&limit=10&api_key=${API_KEY}`);
 
-    // If we got an immediate error fetching the breed data . . .
-    if (!breedApiResponse || !breedApiResponse.ok) {
-        const error = new Error(`HTTP error! status: ${breedApiResponse?.status}`);
-        console.error('Error loading breed info:', error);
-        return;
-    }
-
-    // Otherwise wait for the data to load
-    const breedData = await breedApiResponse.json();
-
-    // If we got an error loading the data . . .
-    if (!Array.isArray(breedData)) {
-        console.error('Invalid API response');
-        return;
-    }
-
-    // loop through the data and create new <div> elements
-    breedData.forEach(breed => {
-        if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
-            console.warn('Invalid breed data:', breed);
+        // If we got an immediate error fetching the breed data . . .
+        if (!breedApiResponse || !breedApiResponse.ok) {
+            const error = new Error(`HTTP error! status: ${breedApiResponse?.status}`);
+            console.error('Error loading breed info:', error);
             return;
         }
 
-        console.log(`adding picture (${breed.id}) from (${breed.url})`)
+        // Otherwise wait for the data to load
+        const breedData = await breedApiResponse.json();
 
-        // Create a div for the picture
-        let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
-        appendCarousel(item);
-    });
+        // If we got an error loading the data . . .
+        if (!Array.isArray(breedData)) {
+            console.error('Invalid API response');
+            return;
+        }
 
-    startCarousel();
+        // loop through the data and create new <div> elements
+        breedData.forEach(breed => {
+            if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
+                console.warn('Invalid breed data:', breed);
+                return;
+            }
+
+            console.log(`adding picture (${breed.id}) from (${breed.url})`)
+
+            // Create a div for the picture
+            let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+            appendCarousel(item);
+        });
+
+        startCarousel();
+    } catch (error) {
+        console.error('Error loading breed info:', error);
+    }
 }
-
 async function populateCarouselAxios() {
 
-    // Clear the carousel
-    clearCarousel();
+    // Get the DOM element for the progress bar
+    let progressBarElement = document.getElementById('progressBar');
 
-    // Retrieve information on the selected breed from the cat API using Axios
-    const breedResponse = await axiosInstance.get(`images/search`, {
-        params: {
-            breed_id: breedSelect.value,
-            limit: 10,
+    // Axios progress indicator callback function
+    function axiosProgressEventListener(event) {
+
+        // If it's a valid event
+        if (event && event.loaded && event.total) {
+
+            // Calculate the percentage of the download event
+            const percent = (event.loaded / event.total) * 100;
+
+            // Update the progress bar
+            if (progressBarElement) {
+                progressBarElement.style.width = `${percent}%`;
+            }
         }
-    });
-
-    // If we got an error loading the data . . .
-    if (!Array.isArray(breedResponse.data)) {
-        console.error('Invalid API response');
-        return;
     }
 
-    // loop through the data and create new <div> elements
-    breedResponse.data.forEach(breed => {
-        if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
-            console.warn('Invalid breed data:', breed);
+    try {
+
+        // Clear the carousel
+        clearCarousel();
+
+        // Reset progress bar to 0%
+        if (progressBarElement) {
+            progressBarElement.style.width = `0%`;
+        }
+
+        // Retrieve information on the selected breed from the cat API using Axios
+        const breedResponse = await axiosInstance.get(`images/search`, {
+            params: {
+                breed_id: breedSelect.value,
+                limit: 10,
+            },
+            onDownloadProgress: axiosProgressEventListener,
+        });
+
+        if (!breedResponse || !breedResponse.data) {
+            console.error('No response from the server');
             return;
         }
 
-        console.log(`adding picture (${breed.id}) from (${breed.url})`)
+        if (!Array.isArray(breedResponse.data)) {
+            console.error('Invalid API response');
+            return;
+        }
 
-        // Create a div for the picture
-        let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
-        appendCarousel(item);
-    });
+        if (progressBarElement) {
+            progressBarElement.style.width = `100%`;
+        }
 
-    startCarousel();
+        // loop through the data and create new <div> elements
+        breedResponse.data.forEach(breed => {
+            if (!breed || !breed.id || !breed.url || !breed.breeds || !breed.breeds[0] || !breed.breeds[0].description) {
+                console.warn('Invalid breed data:', breed);
+                return;
+            }
+
+            console.log(`adding picture (${breed.id}) from (${breed.url})`)
+
+            // Create a div for the picture
+            let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+            appendCarousel(item);
+        });
+
+        if (progressBarElement) {
+            progressBarElement.style.width = `100%`;
+        }
+
+        startCarousel();
+
+    } catch (error) {
+        console.error('Error loading breed info:', error);
+    }
 }
-
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
 
 // Fetch version
 // initialLoadFetch();
-
-
-// Axios version
-initialLoadAxios();
-
-
 
 /**
  * 4. Change all of your fetch() functions to axios!
@@ -264,12 +288,33 @@ initialLoadAxios();
  *   send it manually with all of your requests! You can also set a default base URL!
  */
 
+// Axios version
+initialLoadAxios();
+
+
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
  * - Add a console.log statement to indicate when requests begin.
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
+
+// create an axios interceptor that makes a timestamp of when the request was started
+axiosInstance.interceptors.request.use((config) => {
+
+    // Console log the current date/time
+    console.log(`Request started at: ${new Date()}`);
+
+    config.params.timestamp = Date.now();
+    return config;
+});
+
+// create an axios inerceptor that logs the response time
+axiosInstance.interceptors.response.use((response) => {
+    console.log(`Response time: ${Date.now() - response.config.params.timestamp} ms`);
+    return response;
+});
+
 
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
