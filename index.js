@@ -7,6 +7,11 @@ const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
+
+// Tell carousel what the name of the function to callback when a  
+// favourite button is clicked.
+setFavoriteCallback(favourite);
+
 // Step 0: Store your API key here for reference and easy access.
 // const API_KEY = "";
 const API_KEY = 'live_gipO1O04xaeRbG8Sw5ID3Ylge8pdLBsvOIULoZ5jGIEdoRlA2NfkdkEudoYCsgKX';
@@ -316,6 +321,9 @@ initialLoadAxios();
 // create an axios interceptor that makes a timestamp of when the request was started
 axiosInstance.interceptors.request.use((config) => {
 
+    // In your request interceptor, set the body element's cursor style to "progress."
+    document.body.style.cursor = "progress";
+
     // Console log the current date/time
     console.log(`Request started at: ${new Date()}`);
 
@@ -326,6 +334,9 @@ axiosInstance.interceptors.request.use((config) => {
 // create an axios inerceptor that logs the response time
 axiosInstance.interceptors.response.use((response) => {
     console.log(`Response time: ${Date.now() - response.config.params.timestamp} ms`);
+
+    // In your response interceptor, remove the progress cursor style from the body element.
+    document.body.style.cursor = "default";
     return response;
 });
 
@@ -356,6 +367,10 @@ axiosInstance.interceptors.response.use((response) => {
  * - In your response interceptor, remove the progress cursor style from the body element.
  */
 
+//////////////////////////
+// DONE
+//////////////////////////
+
 /**
  * 8. To practice posting data, we'll create a system to "favourite" certain images.
  * - The skeleton of this function has already been created for you.
@@ -367,8 +382,17 @@ axiosInstance.interceptors.response.use((response) => {
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
- async function favourite(imgId) {
-  // your code here
+async function favourite(imgId) {
+
+    // your code here
+    const isFavourited = await axiosInstance.get(`favourites/${imgId}`).then(() => true).catch(() => false);
+    if (isFavourited) {
+        console.log(`Delete favourited ${imgId}`);
+        await axiosInstance.delete(`favourites/${imgId}`);
+    } else {
+        console.log(`Add favourited cat picture ${imgId}`);
+        await axiosInstance.post(`favourites`, {image_id: imgId});
+    }
 }
 
 /**
@@ -380,6 +404,42 @@ axiosInstance.interceptors.response.use((response) => {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
+async function getFavourites() {
+    try {
+        const favouritesResponse = await axiosInstance.get('favourites');
+        if (!favouritesResponse || !favouritesResponse.data) {
+            console.error('No response from the server');
+            return;
+        }
+
+        if (!Array.isArray(favouritesResponse.data)) {
+            console.error('Invalid API response');
+            return;
+        }
+
+        clearCarousel();
+        favouritesResponse.data.forEach(favourite => {
+
+            debugger;
+
+            if (!favourite?.id ||
+                !favourite?.image.url) {
+                console.warn('Invalid favourite data:', favourite);
+                return;
+            }
+
+            const item = createCarouselItem(favourite.image.url, "", favourite.image.id);
+            appendCarousel(item);
+        });
+
+        startCarousel();
+
+    } catch (error) {
+        console.error('Error loading breed info:', error);
+    }
+}
+
+getFavouritesBtn.addEventListener("click", getFavourites);
 
 /**
  * 10. Test your site, thoroughly!

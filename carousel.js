@@ -1,6 +1,12 @@
 // import * as bootstrap from "bootstrap";
 // import { favourite } from "./index.js";
 
+let favoriteFunction = null;
+
+function setFavoriteCallback(functionName) {
+    favoriteFunction = functionName;
+}
+
 function createCarouselItem(imgSrc, imgAlt, imgId) {
   const template = document.querySelector("#carouselItemTemplate");
   const clone = template.content.firstElementChild.cloneNode(true);
@@ -11,7 +17,8 @@ function createCarouselItem(imgSrc, imgAlt, imgId) {
 
   const favBtn = clone.querySelector(".favourite-button");
   favBtn.addEventListener("click", () => {
-    favourite(imgId);
+    //favourite(imgId);
+    favoriteFunction(imgId);
   });
 
   return clone;
