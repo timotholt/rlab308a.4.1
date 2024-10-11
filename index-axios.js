@@ -309,7 +309,10 @@ async function populateCarouselAxios() {
         }
 
         // Put the breed description into the infoDump element
-        infoDump.innerHTML = breedResponse.data[0].breeds[0].description;
+        infoDump.innerHTML  = `<h1>Origin:</h1>${breedData[0].breeds[0].origin}`;
+        infoDump.innerHTML += `<br><h1>Temperament:</h1> ${breedData[0].breeds[0].temperament}`;
+        infoDump.innerHTML += `<br><h1>Description:</h1> ${breedData[0].breeds[0].description}`;
+
 
         // Restart the carousel
         startCarousel();

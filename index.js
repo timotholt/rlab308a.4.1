@@ -214,7 +214,9 @@ async function populateCarouselFetch() {
 
         // Populate the information section
         // infoDump.innerHTML = "Hello world"
-        infoDump.innerHTML = breedData[0].breeds[0].description;
+        infoDump.innerHTML  = `<h4>Origin:</h4>${breedData[0].breeds[0].origin}`;
+        infoDump.innerHTML += `<br><h4>Temperament:</h4> ${breedData[0].breeds[0].temperament}`;
+        infoDump.innerHTML += `<br><h4>Description:</h4> ${breedData[0].breeds[0].description}`;
 
         // Restart the carousel
         startCarousel();
