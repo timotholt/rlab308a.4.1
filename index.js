@@ -86,6 +86,7 @@ const axiosInstance = axios.create({
     baseURL: 'https://api.thecatapi.com/v1/',
     params: {
         api_key: API_KEY
+        // "x-api-key": API_KEY
     }
 });
 
@@ -325,7 +326,10 @@ axiosInstance.interceptors.request.use((config) => {
     document.body.style.cursor = "progress";
 
     // Console log the current date/time
-    console.log(`Request started at: ${new Date()}`);
+    console.log(`Request started at: ${new Date()}`);``
+
+    // Display http request to the console
+    console.log(config);
 
     config.params.timestamp = Date.now();
     return config;
@@ -384,14 +388,32 @@ axiosInstance.interceptors.response.use((response) => {
  */
 async function favourite(imgId) {
 
+
+    debugger;
+
     // your code here
-    const isFavourited = await axiosInstance.get(`favourites/${imgId}`).then(() => true).catch(() => false);
-    if (isFavourited) {
-        console.log(`Delete favourited ${imgId}`);
-        await axiosInstance.delete(`favourites/${imgId}`);
-    } else {
-        console.log(`Add favourited cat picture ${imgId}`);
+    try {
+        // Get list of favourites
+        const favouritesResponse = await axiosInstance.get('favourites');
+
+        // Check if image is already favourited
+        if (favouritesResponse.data.some(favourite => favourite.image_id === imgId)) {
+
+            let id = favouritesResponse.data.find(favourite => favourite.image_id === imgId).id;
+            let imageId = favouritesResponse.data.find(favourite => favourite.image_id === imgId).image_id;
+            let userId = favouritesResponse.data.find(favourite => favourite.image_id === imgId).user_id;
+
+            console.log(`favourite: ID=${id} ImageId=${imageId} for UserId=${userId} already favourited, trying to delete it`);
+            await axiosInstance.delete(`favourites/${id}`);
+            console.log(`Delete favourited ${imgId}`);
+            return;
+        }
+
+        // Add favourite
         await axiosInstance.post(`favourites`, {image_id: imgId});
+        console.log(`Add favourited cat picture ${imgId}`);
+    } catch (error) {
+        console.error(`Error favouriting ${imgId}`, error);
     }
 }
 
@@ -420,8 +442,7 @@ async function getFavourites() {
         clearCarousel();
         favouritesResponse.data.forEach(favourite => {
 
-            debugger;
-
+            // if we don't have an id or name . . .
             if (!favourite?.id ||
                 !favourite?.image.url) {
                 console.warn('Invalid favourite data:', favourite);
