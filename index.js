@@ -417,10 +417,7 @@ initialLoadFetch();
 
 async function favouriteFetch(imgId) {
 
-    // your code here
     try {
-
-        debugger;
 
         // Get list of favourites
         const response = await fetch(`https://api.thecatapi.com/v1/favourites?api_key=${API_KEY}`, {
@@ -430,33 +427,51 @@ async function favouriteFetch(imgId) {
             },
         });
 
+        if (!response || !response.ok) {
+            throw new Error(`HTTP error! status: ${response?.status}`);
+        }
+
         const favouritesResponse = await response.json();
 
         // Check if image is already favourited
-        if (favouritesResponse.some(favourite => favourite.image_id === imgId)) {
-
-            let id = favouritesResponse.find(favourite => favourite.image_id === imgId).id;
-            let imageId = favouritesResponse.find(favourite => favourite.image_id === imgId).image_id;
-            let userId = favouritesResponse.find(favourite => favourite.image_id === imgId).user_id;
-
-            console.log(`favourite: ID=${id} ImageId=${imageId} for UserId=${userId} already favourited, trying to delete it`);
-            const deleteResponse = await fetch(`https://api.thecatapi.com/v1/favourites/${id}`, { method: "DELETE" });
-            console.log(`Delete favourited ${imgId}`);
-            return;
+        if (favouritesResponse && Array.isArray(favouritesResponse)) {
+            const favourite = favouritesResponse.find(f => f?.image_id === imgId);
+            if (favourite) {
+                const { id, image_id: imageId, user_id: userId } = favourite;
+                console.log(`favourite: ID=${id} ImageId=${imageId} for UserId=${userId} already favourited, trying to delete it`);
+                try {
+                    const deleteResponse = await fetch(`https://api.thecatapi.com/v1/favourites/${id}?api_key=${API_KEY}`, { method: "DELETE" });
+                    if (!deleteResponse || !deleteResponse.ok) {
+                        throw new Error(`HTTP error! status: ${deleteResponse?.status}`);
+                    }
+                    console.log(`Delete favourited ${imgId}`);
+                } catch (error) {
+                    console.error(`Error deleting favourite ${imgId}`, error);
+                }
+                return;
+            }
         }
 
         // Add favourite
-        const addResponse = await fetch(`https://api.thecatapi.com/v1/favourites?api_key=${API_KEY}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ image_id: imgId }),
-        });
-        console.log(`Add favourited cat picture ${imgId}`);
+        try {
+            const addResponse = await fetch(`https://api.thecatapi.com/v1/favourites?api_key=${API_KEY}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ image_id: imgId }),
+            });
+            if (!addResponse || !addResponse.ok) {
+                throw new Error(`HTTP error! status: ${addResponse?.status}`);
+            }
+            console.log(`Add favourited cat picture ${imgId}`);
+        } catch (error) {
+            console.error(`Error favouriting ${imgId}`, error);
+        }
     } catch (error) {
-        console.error(`Error favouriting ${imgId}`, error);
+        console.error(`Error in favouriteFetch`, error);
     }
+
 }
 
 // async function favouriteAxios(imgId) {
