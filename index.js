@@ -12,7 +12,7 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 // favourite button is clicked.
 ////////////////////////////////////////////////////////////////////////
 
-setFavoriteCallback(favourite);
+setFavoriteCallback(favouriteFetch);
 
 ////////////////////////////////////////////////////////////////////////
 // Step 0: Store your API key here for reference and easy access.
@@ -88,7 +88,7 @@ async function initialLoadFetch() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Axiom version
+// Axios version
 ////////////////////////////////////////////////////////////////////////
 
 // const axiosInstance = axios.create({
@@ -414,33 +414,72 @@ initialLoadFetch();
  *   you delete that favourite using the API, giving this function "toggle" functionality.
  * - You can call this function by clicking on the heart at the top right of any image.
  */
-async function favourite(imgId) {
+
+async function favouriteFetch(imgId) {
 
     // your code here
     try {
+
+        debugger;
+
         // Get list of favourites
-        const favouritesResponse = await axiosInstance.get('favourites');
+        const response = await fetch("https://api.thecatapi.com/v1/favourites");
+        const favouritesResponse = await response.json();
 
         // Check if image is already favourited
-        if (favouritesResponse.data.some(favourite => favourite.image_id === imgId)) {
+        if (favouritesResponse.some(favourite => favourite.image_id === imgId)) {
 
-            let id = favouritesResponse.data.find(favourite => favourite.image_id === imgId).id;
-            let imageId = favouritesResponse.data.find(favourite => favourite.image_id === imgId).image_id;
-            let userId = favouritesResponse.data.find(favourite => favourite.image_id === imgId).user_id;
+            let id = favouritesResponse.find(favourite => favourite.image_id === imgId).id;
+            let imageId = favouritesResponse.find(favourite => favourite.image_id === imgId).image_id;
+            let userId = favouritesResponse.find(favourite => favourite.image_id === imgId).user_id;
 
             console.log(`favourite: ID=${id} ImageId=${imageId} for UserId=${userId} already favourited, trying to delete it`);
-            await axiosInstance.delete(`favourites/${id}`);
+            const deleteResponse = await fetch(`https://api.thecatapi.com/v1/favourites/${id}`, { method: "DELETE" });
             console.log(`Delete favourited ${imgId}`);
             return;
         }
 
         // Add favourite
-        await axiosInstance.post(`favourites`, {image_id: imgId});
+        const addResponse = await fetch("https://api.thecatapi.com/v1/favourites", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ image_id: imgId }),
+        });
         console.log(`Add favourited cat picture ${imgId}`);
     } catch (error) {
         console.error(`Error favouriting ${imgId}`, error);
     }
 }
+
+// async function favouriteAxios(imgId) {
+
+//     // your code here
+//     try {
+//         // Get list of favourites
+//         const favouritesResponse = await axiosInstance.get('favourites');
+
+//         // Check if image is already favourited
+//         if (favouritesResponse.data.some(favourite => favourite.image_id === imgId)) {
+
+//             let id = favouritesResponse.data.find(favourite => favourite.image_id === imgId).id;
+//             let imageId = favouritesResponse.data.find(favourite => favourite.image_id === imgId).image_id;
+//             let userId = favouritesResponse.data.find(favourite => favourite.image_id === imgId).user_id;
+
+//             console.log(`favourite: ID=${id} ImageId=${imageId} for UserId=${userId} already favourited, trying to delete it`);
+//             await axiosInstance.delete(`favourites/${id}`);
+//             console.log(`Delete favourited ${imgId}`);
+//             return;
+//         }
+
+//         // Add favourite
+//         await axiosInstance.post(`favourites`, {image_id: imgId});
+//         console.log(`Add favourited cat picture ${imgId}`);
+//     } catch (error) {
+//         console.error(`Error favouriting ${imgId}`, error);
+//     }
+// }
 
 /**
  * 9. Test your favourite() function by creating a getFavourites() function.
@@ -451,21 +490,27 @@ async function favourite(imgId) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
-async function getFavourites() {
+
+async function getFavouritesFetch() {
+
+    debugger;
+
     try {
-        const favouritesResponse = await axiosInstance.get('favourites');
-        if (!favouritesResponse || !favouritesResponse.data) {
+        const response = await fetch(`https://api.thecatapi.com/v1/favourites?api_key=${API_KEY}`);
+        const favouritesResponse = await response.json();
+
+        if (!response || !favouritesResponse) {
             console.error('No response from the server');
             return;
         }
 
-        if (!Array.isArray(favouritesResponse.data)) {
+        if (!Array.isArray(favouritesResponse)) {
             console.error('Invalid API response');
             return;
         }
 
         clearCarousel();
-        favouritesResponse.data.forEach(favourite => {
+        favouritesResponse.forEach(favourite => {
 
             // if we don't have an id or name . . .
             if (!favourite?.id ||
@@ -484,8 +529,43 @@ async function getFavourites() {
         console.error('Error loading breed info:', error);
     }
 }
+// async function getFavouritesAxios() {
+//     try {
+//         const favouritesResponse = await axiosInstance.get('favourites');
+//         if (!favouritesResponse || !favouritesResponse.data) {
+//             console.error('No response from the server');
+//             return;
+//         }
 
-getFavouritesBtn.addEventListener("click", getFavourites);
+//         if (!Array.isArray(favouritesResponse.data)) {
+//             console.error('Invalid API response');
+//             return;
+//         }
+
+//         clearCarousel();
+//         favouritesResponse.data.forEach(favourite => {
+
+//             // if we don't have an id or name . . .
+//             if (!favourite?.id ||
+//                 !favourite?.image.url) {
+//                 console.warn('Invalid favourite data:', favourite);
+//                 return;
+//             }
+
+//             const item = createCarouselItem(favourite.image.url, "", favourite.image.id);
+//             appendCarousel(item);
+//         });
+
+//         startCarousel();
+
+//     } catch (error) {
+//         console.error('Error loading breed info:', error);
+//     }
+// }
+
+// getFavouritesBtn.addEventListener("click", getFavouritesAxios);
+
+getFavouritesBtn.addEventListener("click", getFavouritesFetch);
 
 /**
  * 10. Test your site, thoroughly!
