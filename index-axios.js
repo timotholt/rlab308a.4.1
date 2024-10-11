@@ -91,62 +91,62 @@ async function initialLoadFetch() {
 // Axiom version
 ////////////////////////////////////////////////////////////////////////
 
-// const axiosInstance = axios.create({
-//     baseURL: 'https://api.thecatapi.com/v1/',
-//     params: {
-//         api_key: API_KEY
-//         // "x-api-key": API_KEY
-//     }
-// });
+const axiosInstance = axios.create({
+    baseURL: 'https://api.thecatapi.com/v1/',
+    params: {
+        api_key: API_KEY
+        // "x-api-key": API_KEY
+    }
+});
 
-// async function initialLoadAxios() {
+async function initialLoadAxios() {
 
-//     // Catch any errors by putting it in a try/catch block
-//     try {
+    // Catch any errors by putting it in a try/catch block
+    try {
 
-//         // Fetch breed data
-//         const breedResponse = await axiosInstance.get(`breeds`, {
-//             params: {
-//                 api_key: API_KEY
-//             }
-//         });
+        // Fetch breed data
+        const breedResponse = await axiosInstance.get(`breeds`, {
+            params: {
+                api_key: API_KEY
+            }
+        });
 
-//         // If we got an error loading the data . . .
-//         if (!Array.isArray(breedResponse.data)) {
+        // If we got an error loading the data . . .
+        if (!Array.isArray(breedResponse.data)) {
 
-//             // ... throw an error!
-//             throw new Error('Invalid API response');
-//         }
+            // ... throw an error!
+            throw new Error('Invalid API response');
+        }
 
-//         // loop through the data and create new <option> elements
-//         breedResponse.data.forEach(breed => {
+        // loop through the data and create new <option> elements
+        breedResponse.data.forEach(breed => {
 
-//             // if we don't have an id or name . . .
-//             if (!breed?.id || !breed?.name) {
-//                 console.warn('Invalid breed data:', breed);
-//                 return;
-//             }
+            // if we don't have an id or name . . .
+            if (!breed?.id || !breed?.name) {
+                console.warn('Invalid breed data:', breed);
+                return;
+            }
 
-//             // create a new <option> element
-//             const option = document.createElement("option");
-//             option.value = breed.id;
-//             option.textContent = breed.name;
-//             breedSelect.appendChild(option);
-//         });
+            // create a new <option> element
+            const option = document.createElement("option");
+            option.value = breed.id;
+            option.textContent = breed.name;
+            breedSelect.appendChild(option);
+        });
 
-//         // Populate the carousel
-//         populateCarouselAxios();
+        // Populate the carousel
+        populateCarouselAxios();
 
-//         // Add an event listener to the select element
-//         breedSelect.addEventListener("change", async () => {
-//             populateCarouselAxios();
-//         });
-//     }
+        // Add an event listener to the select element
+        breedSelect.addEventListener("change", async () => {
+            populateCarouselAxios();
+        });
+    }
 
-//     catch (error) {
-//         console.error('Error loading breeds:', error);
-//     }
-// }
+    catch (error) {
+        console.error('Error loading breeds:', error);
+    }
+}
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -193,7 +193,7 @@ async function populateCarouselFetch() {
         }
 
         // Handle the Malayan breed
-        if (breedData.length === 0) {
+        if (breedResponse.data.length === 0) {
             console.warn('Invalid breed data:', breed);
             return;
         }
@@ -215,8 +215,8 @@ async function populateCarouselFetch() {
         debugger;
 
         // Populate the information section
-        // infoDump.innerHTML = "Hello world"
-        infoDump.innerHTML = breedData[0].breeds[0].description;
+        infoDump.innerHTML = "Hello world"
+        // infoDump.innerHTML = breedData[0].breeds[0].description;
 
         // Restart the carousel
         startCarousel();
@@ -230,103 +230,103 @@ async function populateCarouselFetch() {
 // New school Axios version
 ////////////////////////////////////////////////////////////////////////
 
-// async function populateCarouselAxios() {
+async function populateCarouselAxios() {
 
-//     // Get the DOM element for the progress bar
-//     let progressBarElement = document.getElementById('progressBar');
+    // Get the DOM element for the progress bar
+    let progressBarElement = document.getElementById('progressBar');
 
-//     // Axios progress indicator callback function
-//     function axiosProgressEventListener(event) {
+    // Axios progress indicator callback function
+    function axiosProgressEventListener(event) {
 
-//         // If it's a valid event
-//         if (event && event.loaded && event.total) {
+        // If it's a valid event
+        if (event && event.loaded && event.total) {
 
-//             // Calculate the percentage of the download event
-//             const percent = (event.loaded / event.total) * 100;
+            // Calculate the percentage of the download event
+            const percent = (event.loaded / event.total) * 100;
 
-//             // Update the progress bar
-//             if (progressBarElement) {
-//                 progressBarElement.style.width = `${percent}%`;
-//             }
-//         }
-//     }
+            // Update the progress bar
+            if (progressBarElement) {
+                progressBarElement.style.width = `${percent}%`;
+            }
+        }
+    }
 
-//     try {
+    try {
 
-//         // Clear the carousel
-//         clearCarousel();
+        // Clear the carousel
+        clearCarousel();
 
-//         // Reset progress bar to 0%
-//         if (progressBarElement) {
-//             progressBarElement.style.width = `0%`;
-//         }
+        // Reset progress bar to 0%
+        if (progressBarElement) {
+            progressBarElement.style.width = `0%`;
+        }
 
-//         // Retrieve information on the selected breed from the cat API using Axios
-//         const breedResponse = await axiosInstance.get(`images/search`, {
-//             params: {
-//                 breed_id: breedSelect.value,
-//                 limit: 10,
-//             },
-//             onDownloadProgress: axiosProgressEventListener,
-//         });
+        // Retrieve information on the selected breed from the cat API using Axios
+        const breedResponse = await axiosInstance.get(`images/search`, {
+            params: {
+                breed_id: breedSelect.value,
+                limit: 10,
+            },
+            onDownloadProgress: axiosProgressEventListener,
+        });
 
-//         if (!breedResponse || !breedResponse.data) {
-//             console.error('No response from the server');
-//             return;
-//         }
+        if (!breedResponse || !breedResponse.data) {
+            console.error('No response from the server');
+            return;
+        }
 
-//         if (!Array.isArray(breedResponse.data)) {
-//             console.error('Invalid API response');
-//             return;
-//         }
+        if (!Array.isArray(breedResponse.data)) {
+            console.error('Invalid API response');
+            return;
+        }
 
-//         if (progressBarElement) {
-//             progressBarElement.style.width = `100%`;
-//         }
+        if (progressBarElement) {
+            progressBarElement.style.width = `100%`;
+        }
 
-//         // Handle the Malayan breed
-//         if (breedResponse.data.length === 0) {
-//             console.warn('Invalid breed data:', breed);
-//             return;
-//         }
+        // Handle the Malayan breed
+        if (breedResponse.data.length === 0) {
+            console.warn('Invalid breed data:', breed);
+            return;
+        }
 
-//         // loop through the data and create new <div> elements                                                                                                                          
-//         breedResponse.data.forEach(breed => {
-//             if (!breed || !breed.id || !breed.url || !breed.breeds || !breed.breeds[0] || !breed.breeds[0].description) {
-//                 console.warn('Invalid breed data:', breed);
-//                 return;
-//             }
+        // loop through the data and create new <div> elements                                                                                                                          
+        breedResponse.data.forEach(breed => {
+            if (!breed || !breed.id || !breed.url || !breed.breeds || !breed.breeds[0] || !breed.breeds[0].description) {
+                console.warn('Invalid breed data:', breed);
+                return;
+            }
 
-//             console.log(`adding picture (${breed.id}) from (${breed.url})`)
+            console.log(`adding picture (${breed.id}) from (${breed.url})`)
 
-//             // Create a div for the picture
-//             let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+            // Create a div for the picture
+            let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
 
-//             // Append the div to the carousel
-//             appendCarousel(item);
-//         });
+            // Append the div to the carousel
+            appendCarousel(item);
+        });
 
-//         if (progressBarElement) {
-//             progressBarElement.style.width = `100%`;
-//         }
+        if (progressBarElement) {
+            progressBarElement.style.width = `100%`;
+        }
 
-//         // Put the breed description into the infoDump element
-//         infoDump.innerHTML = breedResponse.data[0].breeds[0].description;
+        // Put the breed description into the infoDump element
+        infoDump.innerHTML = breedResponse.data[0].breeds[0].description;
 
-//         // Restart the carousel
-//         startCarousel();
+        // Restart the carousel
+        startCarousel();
 
-//     } catch (error) {
-//         console.error('Error loading breed info:', error);
-//     }
-// }
+    } catch (error) {
+        console.error('Error loading breed info:', error);
+    }
+}
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
 
 // Fetch version
-initialLoadFetch();
+// initialLoadFetch();
 
 /**
  * 4. Change all of your fetch() functions to axios!
@@ -339,7 +339,7 @@ initialLoadFetch();
  */
 
 // Axios version
-// initialLoadAxios();
+initialLoadAxios();
 
 
 /**
@@ -349,30 +349,30 @@ initialLoadFetch();
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
-// // create an axios interceptor that makes a timestamp of when the request was started
-// axiosInstance.interceptors.request.use((config) => {
+// create an axios interceptor that makes a timestamp of when the request was started
+axiosInstance.interceptors.request.use((config) => {
 
-//     // In your request interceptor, set the body element's cursor style to "progress."
-//     document.body.style.cursor = "progress";
+    // In your request interceptor, set the body element's cursor style to "progress."
+    document.body.style.cursor = "progress";
 
-//     // Console log the current date/time
-//     console.log(`Request started at: ${new Date()}`);``
+    // Console log the current date/time
+    console.log(`Request started at: ${new Date()}`);``
 
-//     // Display http request to the console
-//     console.log(config);
+    // Display http request to the console
+    console.log(config);
 
-//     config.params.timestamp = Date.now();
-//     return config;
-// });
+    config.params.timestamp = Date.now();
+    return config;
+});
 
-// // create an axios inerceptor that logs the response time
-// axiosInstance.interceptors.response.use((response) => {
-//     console.log(`Response time: ${Date.now() - response.config.params.timestamp} ms`);
+// create an axios inerceptor that logs the response time
+axiosInstance.interceptors.response.use((response) => {
+    console.log(`Response time: ${Date.now() - response.config.params.timestamp} ms`);
 
-//     // In your response interceptor, remove the progress cursor style from the body element.
-//     document.body.style.cursor = "default";
-//     return response;
-// });
+    // In your response interceptor, remove the progress cursor style from the body element.
+    document.body.style.cursor = "default";
+    return response;
+});
 
 
 /**
