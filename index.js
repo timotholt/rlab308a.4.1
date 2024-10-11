@@ -7,13 +7,17 @@ const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
-
+////////////////////////////////////////////////////////////////////////
 // Tell carousel what the name of the function to callback when a  
 // favourite button is clicked.
+////////////////////////////////////////////////////////////////////////
+
 setFavoriteCallback(favourite);
 
+////////////////////////////////////////////////////////////////////////
 // Step 0: Store your API key here for reference and easy access.
-// const API_KEY = "";
+////////////////////////////////////////////////////////////////////////
+
 const API_KEY = 'live_gipO1O04xaeRbG8Sw5ID3Ylge8pdLBsvOIULoZ5jGIEdoRlA2NfkdkEudoYCsgKX';
 
 /**
@@ -24,6 +28,10 @@ const API_KEY = 'live_gipO1O04xaeRbG8Sw5ID3Ylge8pdLBsvOIULoZ5jGIEdoRlA2NfkdkEudo
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+
+////////////////////////////////////////////////////////////////////////
+// Old school Fetch version
+////////////////////////////////////////////////////////////////////////
 
 async function initialLoadFetch() {
 
@@ -79,8 +87,9 @@ async function initialLoadFetch() {
     }
 }
 
-//==============================================================================
-// Axios version
+////////////////////////////////////////////////////////////////////////
+// Axiom version
+////////////////////////////////////////////////////////////////////////
 
 const axiosInstance = axios.create({
     baseURL: 'https://api.thecatapi.com/v1/',
@@ -89,7 +98,6 @@ const axiosInstance = axios.create({
         // "x-api-key": API_KEY
     }
 });
-
 
 async function initialLoadAxios() {
 
@@ -155,6 +163,10 @@ async function initialLoadAxios() {
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
+////////////////////////////////////////////////////////////////////////
+// Old school Fetch version
+////////////////////////////////////////////////////////////////////////
+
 async function populateCarouselFetch() {
 
     // Clear the carousel
@@ -207,6 +219,11 @@ async function populateCarouselFetch() {
         console.error('Error loading breed info:', error);
     }
 }
+
+////////////////////////////////////////////////////////////////////////
+// New school Axios version
+////////////////////////////////////////////////////////////////////////
+
 async function populateCarouselAxios() {
 
     // Get the DOM element for the progress bar
@@ -261,7 +278,13 @@ async function populateCarouselAxios() {
             progressBarElement.style.width = `100%`;
         }
 
-        // loop through the data and create new <div> elements
+        // Handle the Malayan breed
+        if (breedResponse.data.length === 0) {
+            console.warn('Invalid breed data:', breed);
+            return;
+        }
+
+        // loop through the data and create new <div> elements                                                                                                                          
         breedResponse.data.forEach(breed => {
             if (!breed || !breed.id || !breed.url || !breed.breeds || !breed.breeds[0] || !breed.breeds[0].description) {
                 console.warn('Invalid breed data:', breed);
@@ -291,6 +314,7 @@ async function populateCarouselAxios() {
         console.error('Error loading breed info:', error);
     }
 }
+
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
  */
@@ -388,9 +412,6 @@ axiosInstance.interceptors.response.use((response) => {
  */
 async function favourite(imgId) {
 
-
-    debugger;
-
     // your code here
     try {
         // Get list of favourites
@@ -469,3 +490,7 @@ getFavouritesBtn.addEventListener("click", getFavourites);
  * - Test other breeds as well. Not every breed has the same data available, so
  *   your code should account for this.
  */
+
+////////////////////////////////////////////////////////////////////////
+// I think it's done!
+////////////////////////////////////////////////////////////////////////
