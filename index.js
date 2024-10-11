@@ -544,9 +544,7 @@ async function getFavouritesFetch() {
         });
 
         // Clear the description area
-        infoDump.innerHTML  = ``;
-        infoDump.innerHTML += ``;
-        infoDump.innerHTML += ``;
+        infoDump.innerHTML  = `<h4>These are your favourites.</h4>`;
 
         startCarousel();
 

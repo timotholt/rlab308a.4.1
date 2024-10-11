@@ -481,11 +481,9 @@ async function getFavourites() {
         });
 
         startCarousel();
-        
+
         // Clear the description area
-        infoDump.innerHTML  = ``;
-        infoDump.innerHTML += ``;
-        infoDump.innerHTML += ``;
+        infoDump.innerHTML  = `<h4>These are your favourites.</h4>`;
 
     } catch (error) {
         console.error('Error loading breed info:', error);
