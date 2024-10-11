@@ -212,8 +212,7 @@ async function populateCarouselFetch() {
             appendCarousel(item);
         });
 
-        // Populate the information section
-        // infoDump.innerHTML = "Hello world"
+        // Populate the information section.  Sorry I'm not writing 15 lines of code when I can use 3.
         infoDump.innerHTML  = `<h4>Origin:</h4>${breedData[0].breeds[0].origin}`;
         infoDump.innerHTML += `<br><h4>Temperament:</h4> ${breedData[0].breeds[0].temperament}`;
         infoDump.innerHTML += `<br><h4>Description:</h4> ${breedData[0].breeds[0].description}`;
@@ -543,6 +542,11 @@ async function getFavouritesFetch() {
             const item = createCarouselItem(favourite.image.url, "", favourite.image.id);
             appendCarousel(item);
         });
+
+        // Clear the description area
+        infoDump.innerHTML  = ``;
+        infoDump.innerHTML += ``;
+        infoDump.innerHTML += ``;
 
         startCarousel();
 

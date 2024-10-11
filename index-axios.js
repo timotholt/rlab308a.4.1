@@ -309,10 +309,9 @@ async function populateCarouselAxios() {
         }
 
         // Put the breed description into the infoDump element
-        infoDump.innerHTML  = `<h1>Origin:</h1>${breedData[0].breeds[0].origin}`;
-        infoDump.innerHTML += `<br><h1>Temperament:</h1> ${breedData[0].breeds[0].temperament}`;
-        infoDump.innerHTML += `<br><h1>Description:</h1> ${breedData[0].breeds[0].description}`;
-
+        infoDump.innerHTML  = `<h4>Origin:</h4>${breedResponse.data[0].breeds[0].origin}`;
+        infoDump.innerHTML += `<br><h4>Temperament:</h4> ${breedResponse.data[0].breeds[0].temperament}`;
+        infoDump.innerHTML += `<br><h4>Description:</h4> ${breedResponse.data[0].breeds[0].description}`;
 
         // Restart the carousel
         startCarousel();
@@ -482,6 +481,11 @@ async function getFavourites() {
         });
 
         startCarousel();
+        
+        // Clear the description area
+        infoDump.innerHTML  = ``;
+        infoDump.innerHTML += ``;
+        infoDump.innerHTML += ``;
 
     } catch (error) {
         console.error('Error loading breed info:', error);
