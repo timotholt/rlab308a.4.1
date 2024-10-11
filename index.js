@@ -423,7 +423,7 @@ async function favouriteFetch(imgId) {
         debugger;
 
         // Get list of favourites
-        const response = await fetch("https://api.thecatapi.com/v1/favourites");
+        const response = await fetch(`https://api.thecatapi.com/v1/favourites?api_key=${API_KEY}`);
         const favouritesResponse = await response.json();
 
         // Check if image is already favourited
@@ -492,8 +492,6 @@ async function favouriteFetch(imgId) {
  */
 
 async function getFavouritesFetch() {
-
-    debugger;
 
     try {
         const response = await fetch(`https://api.thecatapi.com/v1/favourites?api_key=${API_KEY}`);
