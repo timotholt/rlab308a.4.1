@@ -33,62 +33,62 @@ const API_KEY = 'live_gipO1O04xaeRbG8Sw5ID3Ylge8pdLBsvOIULoZ5jGIEdoRlA2NfkdkEudo
 // Old school Fetch version
 ////////////////////////////////////////////////////////////////////////
 
-async function initialLoadFetch() {
+// async function initialLoadFetch() {
 
-    // Catch any errors by putting it in a try/catch block
-    try {
+//     // Catch any errors by putting it in a try/catch block
+//     try {
 
-        // Fetch breed data
-        const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
+//         // Fetch breed data
+//         const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`);
 
-        // If we got an immediate error fetching the breed data . . .
-        if (!breedApiResponse || !breedApiResponse.ok) {
+//         // If we got an immediate error fetching the breed data . . .
+//         if (!breedApiResponse || !breedApiResponse.ok) {
 
-            // ... throw an error!
-            throw new Error(`HTTP error! status: ${breedApiResponse?.status}`);
-        }
+//             // ... throw an error!
+//             throw new Error(`HTTP error! status: ${breedApiResponse?.status}`);
+//         }
 
-        // Otherwise wait for the data to load
-        const breedData = await breedApiResponse.json();
+//         // Otherwise wait for the data to load
+//         const breedData = await breedApiResponse.json();
 
-        // If we got an error loading the data . . .
-        if (!Array.isArray(breedData)) {
+//         // If we got an error loading the data . . .
+//         if (!Array.isArray(breedData)) {
 
-            // ... throw an error!
-            throw new Error('Invalid API response');
-        }
+//             // ... throw an error!
+//             throw new Error('Invalid API response');
+//         }
 
-        // loop through the data and create new <option> elements
-        breedData.forEach(breed => {
+//         // loop through the data and create new <option> elements
+//         breedData.forEach(breed => {
 
-            // if we don't have an id or name . . .
-            if (!breed?.id || !breed?.name) {
-                console.warn('Invalid breed data:', breed);
-                return;
-            }
+//             // if we don't have an id or name . . .
+//             if (!breed?.id || !breed?.name) {
+//                 console.warn('Invalid breed data:', breed);
+//                 return;
+//             }
 
-            // create a new <option> element
-            const option = document.createElement("option");
-            option.value = breed.id;
-            option.textContent = breed.name;
-            breedSelect.appendChild(option);
-        });
+//             // create a new <option> element
+//             const option = document.createElement("option");
+//             option.value = breed.id;
+//             option.textContent = breed.name;
+//             breedSelect.appendChild(option);
+//         });
         
-        // Populate the carousel
-        populateCarouselFetch();
+//         // Populate the carousel
+//         populateCarouselFetch();
 
-        // Add an event listener to the select element
-        breedSelect.addEventListener("change", async () => {
-            populateCarouselFetch();
-        });
-    }
-    catch (error) {
-        console.error('Error loading breeds:', error);
-    }
-}
+//         // Add an event listener to the select element
+//         breedSelect.addEventListener("change", async () => {
+//             populateCarouselFetch();
+//         });
+//     }
+//     catch (error) {
+//         console.error('Error loading breeds:', error);
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////
-// Axiom version
+// Axios version
 ////////////////////////////////////////////////////////////////////////
 
 const axiosInstance = axios.create({
@@ -167,64 +167,62 @@ async function initialLoadAxios() {
 // Old school Fetch version
 ////////////////////////////////////////////////////////////////////////
 
-async function populateCarouselFetch() {
+// async function populateCarouselFetch() {
 
-    // Clear the carousel
-    clearCarousel();
+//     // Clear the carousel
+//     clearCarousel();
 
-    try {
-        // Retrieve information on the selected breed from the cat API using fetch()
-        const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&limit=10&api_key=${API_KEY}`);
+//     try {
+//         // Retrieve information on the selected breed from the cat API using fetch()
+//         const breedApiResponse = await fetch(`https://api.thecatapi.com/v1/images/search?breed_id=${breedSelect.value}&limit=10&api_key=${API_KEY}`);
 
-        // If we got an immediate error fetching the breed data . . .
-        if (!breedApiResponse || !breedApiResponse.ok) {
-            const error = new Error(`HTTP error! status: ${breedApiResponse?.status}`);
-            console.error('Error loading breed info:', error);
-            return;
-        }
+//         // If we got an immediate error fetching the breed data . . .
+//         if (!breedApiResponse || !breedApiResponse.ok) {
+//             const error = new Error(`HTTP error! status: ${breedApiResponse?.status}`);
+//             console.error('Error loading breed info:', error);
+//             return;
+//         }
 
-        // Otherwise wait for the data to load
-        const breedData = await breedApiResponse.json();
+//         // Otherwise wait for the data to load
+//         const breedData = await breedApiResponse.json();
 
-        // If we got an error loading the data . . .
-        if (!Array.isArray(breedData)) {
-            console.error('Invalid API response');
-            return;
-        }
+//         // If we got an error loading the data . . .
+//         if (!Array.isArray(breedData)) {
+//             console.error('Invalid API response');
+//             return;
+//         }
 
-        // Handle the Malayan breed
-        if (breedResponse.data.length === 0) {
-            console.warn('Invalid breed data:', breed);
-            return;
-        }
+//         // Handle the Malayan breed
+//         if (breedResponse.data.length === 0) {
+//             console.warn('Invalid breed data:', breed);
+//             return;
+//         }
 
-        // loop through the data and create new <div> elements
-        breedData.forEach(breed => {
-            if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
-                console.warn('Invalid breed data:', breed);
-                return;
-            }
+//         // loop through the data and create new <div> elements
+//         breedData.forEach(breed => {
+//             if (!breed?.id || !breed?.url || !breed?.breeds || !breed?.breeds[0]?.description) {
+//                 console.warn('Invalid breed data:', breed);
+//                 return;
+//             }
 
-            console.log(`adding picture (${breed.id}) from (${breed.url})`)
+//             console.log(`adding picture (${breed.id}) from (${breed.url})`)
 
-            // Create a div for the picture
-            let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
-            appendCarousel(item);
-        });
+//             // Create a div for the picture
+//             let item = createCarouselItem(breed.url, breed.breeds[0].description, breed.id)
+//             appendCarousel(item);
+//         });
 
-        debugger;
+//         // Populate the information section
+//         // infoDump.innerHTML = "Hello world"
+//         infoDump.innerHTML = breedData[0].breeds[0].description;
 
-        // Populate the information section
-        infoDump.innerHTML = "Hello world"
-        // infoDump.innerHTML = breedData[0].breeds[0].description;
+//         // Restart the carousel
+//         startCarousel();
 
-        // Restart the carousel
-        startCarousel();
-
-    } catch (error) {
-        console.error('Error loading breed info:', error);
-    }
-}
+//     } catch (error) {
+//         console.error('Error loading breed info:', error);
+//     }
+// }
 
 ////////////////////////////////////////////////////////////////////////
 // New school Axios version

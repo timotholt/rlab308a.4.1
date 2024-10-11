@@ -212,8 +212,6 @@ async function populateCarouselFetch() {
             appendCarousel(item);
         });
 
-        debugger;
-
         // Populate the information section
         // infoDump.innerHTML = "Hello world"
         infoDump.innerHTML = breedData[0].breeds[0].description;
